@@ -1,127 +1,365 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Binance Style UI</title>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Swap UI — Demo</title>
 <style>
-    body {
-        font-family: Arial, sans-serif;
-        background-color: #f7f7f7;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        height: 100vh;
-        margin: 0;
-    }
+  :root{
+    --bg:#ffffff;
+    --card:#f7f7f8;
+    --muted:#9aa0a6;
+    --accent:#f6c02d;
+    --accent-dark:#f0b700;
+    --radius:14px;
+    --shadow: 0 6px 18px rgba(22,28,37,0.06);
+    --glass: linear-gradient(180deg, rgba(255,255,255,0.9), rgba(250,250,251,0.9));
+    font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+  }
 
-    .container {
-        background-color: #fff;
-        padding: 25px;
-        border-radius: 15px;
-        width: 350px;
-        box-shadow: 0px 4px 12px rgba(0,0,0,0.1);
-    }
+  html,body{
+    height:100%;
+    margin:0;
+    background:linear-gradient(180deg,#fff 0%, #fafafa 100%);
+    color:#111827;
+    -webkit-font-smoothing:antialiased;
+    -moz-osx-font-smoothing:grayscale;
+  }
 
-    .logo {
-        display: flex;
-        align-items: center;
-        margin-bottom: 10px;
-    }
+  .container{
+    max-width:420px;
+    margin:28px auto;
+    padding:20px;
+  }
 
-    .logo img {
-        width: 30px;
-        height: 30px;
-        margin-right: 8px;
-    }
+  h1{
+    font-size:20px;
+    margin:12px 0 18px;
+    font-weight:600;
+  }
 
-    .logo-text {
-        font-size: 20px;
-        font-weight: bold;
-    }
+  .card{
+    background:var(--card);
+    border-radius:var(--radius);
+    padding:14px;
+    box-shadow:var(--shadow);
+    margin-bottom:12px;
+    position:relative;
+    overflow:hidden;
+  }
 
-    .subtitle {
-        font-size: 14px;
-        color: #000; /* Dark black color as requested */
-        margin-bottom: 20px;
-    }
+  .token-row{
+    display:flex;
+    gap:12px;
+    align-items:center;
+  }
 
-    .form-group {
-        margin-bottom: 15px;
-    }
+  .token-icon{
+    min-width:56px;
+    height:56px;
+    background:linear-gradient(135deg,#0ea5a3,#34d399);
+    border-radius:12px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    color:white;
+    font-weight:700;
+    font-size:20px;
+    box-shadow:0 4px 10px rgba(10,10,10,0.06);
+    flex-shrink:0;
+  }
 
-    label {
-        font-size: 14px;
-        display: block;
-        margin-bottom: 5px;
-        color: #333;
-    }
+  .token-info{
+    flex:1;
+  }
 
-    input {
-        width: 100%;
-        padding: 10px;
-        font-size: 14px;
-        border: 1px solid #ccc;
-        border-radius: 8px;
-        outline: none;
-    }
+  .token-title{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:8px;
+  }
 
-    .max-btn {
-        position: absolute;
-        right: 15px;
-        top: 36px;
-        background-color: transparent;
-        border: none;
-        color: #f0b90b;
-        font-weight: bold;
-        cursor: pointer;
-    }
+  .token-name{
+    font-size:16px;
+    font-weight:700;
+  }
 
-    .input-wrapper {
-        position: relative;
-    }
+  .token-sub{
+    font-size:13px;
+    color:var(--muted);
+    margin-top:6px;
+  }
 
-    .next-btn {
-        width: 100%;
-        padding: 12px;
-        font-size: 16px;
-        background-color: #f0b90b;
-        color: #000;
-        border: none;
-        border-radius: 8px;
-        cursor: pointer;
-        font-weight: bold;
-    }
+  .amount{
+    font-size:20px;
+    font-weight:700;
+    text-align:right;
+    min-width:110px;
+  }
 
-    .next-btn:hover {
-        background-color: #d9a300;
-    }
+  .small-muted{
+    font-size:12px;
+    color:var(--muted);
+    text-align:right;
+    margin-top:6px;
+  }
+
+  .swap-flip{
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    margin: -20px 0 8px;
+    z-index:2;
+  }
+
+  .circle{
+    width:48px;height:48px;border-radius:50%;
+    background:white;box-shadow:0 6px 14px rgba(10,10,10,0.06);
+    display:flex;align-items:center;justify-content:center;font-weight:700;
+    transform: rotate(0deg);
+  }
+
+  .action{
+    margin-top:10px;
+  }
+
+  .btn-swap{
+    width:100%;
+    background:linear-gradient(180deg,var(--accent) 0%, var(--accent-dark) 100%);
+    color:#111827;
+    border:none;
+    padding:16px 18px;
+    border-radius:999px;
+    font-weight:700;
+    font-size:16px;
+    cursor:pointer;
+    box-shadow:0 8px 24px rgba(240,180,0,0.18);
+  }
+
+  .details{
+    margin-top:14px;
+    padding:10px 6px;
+    font-size:14px;
+    color:var(--muted);
+  }
+
+  .detail-row{
+    display:flex;
+    justify-content:space-between;
+    padding:8px 4px;
+    align-items:center;
+  }
+
+  /* Binance text and below text dark black */
+  .detail-row div[style*="Binance"],
+  .detail-row div[style*="Binance"] + div {
+    color: #000000 !important;
+  }
+
+  .tag{
+    background:#eef8ff;
+    color:#0b66ff;
+    padding:4px 8px;
+    border-radius:10px;
+    font-size:12px;
+    font-weight:600;
+  }
+
+  input[type="number"]{
+    width:100%;
+    border:none;
+    background:transparent;
+    font-size:20px;
+    text-align:right;
+    font-weight:700;
+    outline:none;
+  }
+
+  @media (max-width:420px){
+    .container{ padding:12px; }
+    .token-icon{ min-width:48px;height:48px;font-size:18px;border-radius:10px; }
+    .amount{ font-size:18px; min-width:88px; }
+  }
+
+  .icon-usdt{ background: linear-gradient(135deg,#0aa37d,#00c176); }
+  .icon-btc{ background: linear-gradient(135deg,#f59e0b,#f97316); }
+  .token-card{ background: linear-gradient(180deg, rgba(255,255,255,0.6), rgba(250,250,250,0.6)); }
+  .muted-ghost{ color:#b7bec6; font-size:12px; }
+
+  label{ font-size:12px; color:var(--muted); display:block; margin-bottom:6px; }
+  .flex-between{ display:flex; justify-content:space-between; align-items:center; gap:10px; }
 </style>
 </head>
 <body>
+  <div class="container" role="main" aria-labelledby="swapTitle">
+    <h1 id="swapTitle">Swap</h1>
 
-<div class="container">
-    <div class="logo">
-        <img src="https://upload.wikimedia.org/wikipedia/commons/5/57/Binance_Logo.png" alt="Binance Logo">
-        <span class="logo-text">Binance</span>
-    </div>
-    <div class="subtitle">Send USDT (BEP20)</div>
-
-    <div class="form-group">
-        <label>Recipient Address</label>
-        <input type="text" value="0xB53941b949D3ac68Ba48AF3985F9F59105Cdf999" readonly>
-    </div>
-
-    <div class="form-group">
-        <label>Amount</label>
-        <div class="input-wrapper">
-            <input type="number" placeholder="0.00">
-            <button class="max-btn">Max</button>
+    <!-- From card -->
+    <div class="card token-card" aria-label="From token">
+      <label>From</label>
+      <div class="token-row">
+        <div class="token-icon icon-usdt" aria-hidden="true">₮</div>
+        <div class="token-info">
+          <div class="token-title">
+            <div>
+              <div class="token-name">USDT <small style="font-weight:600;color:var(--muted);font-size:12px">▼</small></div>
+              <div class="token-sub">Tether USDT</div>
+            </div>
+            <div style="width:140px;">
+              <div class="amount">
+                <input id="fromAmount" type="number" min="0" step="0.01" value="200" aria-label="From amount" />
+              </div>
+              <div class="small-muted" id="fromUsd">≈$200.00</div>
+            </div>
+          </div>
         </div>
+      </div>
     </div>
 
-    <button class="next-btn">Next</button>
-</div>
+    <!-- flip control -->
+    <div class="swap-flip">
+      <div class="circle" title="Flip tokens" id="flipBtn" role="button" aria-pressed="false" aria-label="Flip tokens">⇅</div>
+    </div>
 
+    <!-- To card -->
+    <div class="card token-card" aria-label="To token">
+      <label>To</label>
+      <div class="token-row">
+        <div class="token-icon icon-btc" aria-hidden="true">฿</div>
+        <div class="token-info">
+          <div class="token-title">
+            <div>
+              <div class="token-name">BTC <small style="font-weight:600;color:var(--muted);font-size:12px">▼</small></div>
+              <div class="token-sub">Bitcoin</div>
+            </div>
+            <div style="width:140px;">
+              <div class="amount" id="toAmount">0.00509437</div>
+              <div class="small-muted" id="toUsd">≈$600.63</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Swap button -->
+    <div class="action">
+      <button class="btn-swap" id="swapBtn">Swap</button>
+    </div>
+
+    <!-- Details -->
+    <div class="details" aria-hidden="false">
+      <div class="detail-row">
+        <div class="flex-between" style="flex:1">
+          <div style="font-weight:600">Route</div>
+        </div>
+        <div style="color:#000000;font-size:13px">Binance</div>
+      </div>
+
+      <div class="detail-row">
+        <div>Rate</div>
+        <div id="rateText" style="color:#000000;">1 USDT ≈ 0.0000084204 BTC</div>
+      </div>
+
+      <div class="detail-row">
+        <div>Slippage</div>
+        <div id="slipText">Auto | 1%</div>
+      </div>
+
+      <div class="detail-row">
+        <div>Min. Received</div>
+        <div id="minRecv">0.0050434 BTC</div>
+      </div>
+
+      <div class="detail-row">
+        <div>Trading Fee</div>
+        <div><s>0.5%</s> <span class="tag" style="background:#e6f8ee;color:#0d8f55">Free</span></div>
+      </div>
+    </div>
+  </div>
+
+<script>
+(function(){
+  const fromInput = document.getElementById('fromAmount');
+  const toAmountEl = document.getElementById('toAmount');
+  const fromUsdEl = document.getElementById('fromUsd');
+  const toUsdEl = document.getElementById('toUsd');
+  const rateText = document.getElementById('rateText');
+  const minRecvEl = document.getElementById('minRecv');
+  const flipBtn = document.getElementById('flipBtn');
+  const swapBtn = document.getElementById('swapBtn');
+
+  let tokenFrom = { symbol: 'USDT', usdPer: 1 };
+  let tokenTo   = { symbol: 'BTC', usdPer: 118000 };
+
+  function computeRate(){
+    return tokenFrom.usdPer / tokenTo.usdPer;
+  }
+
+  tokenFrom.usdPer = 1.00005;
+  tokenTo.usdPer = 118000;
+  let slippagePercent = 1;
+
+  function updateUI(){
+    const rate = computeRate();
+    rateText.textContent = `1 ${tokenFrom.symbol} ≈ ${rate.toFixed(10)} ${tokenTo.symbol}`;
+
+    const fromAmt = parseFloat(fromInput.value) || 0;
+    const toAmt = fromAmt * rate;
+    toAmountEl.textContent = toAmt === 0 ? '0.00000000' : toAmt.toFixed(8);
+
+    const fromUsd = fromAmt * tokenFrom.usdPer;
+    fromUsdEl.textContent = `≈$${fromUsd.toFixed(2)}`;
+
+    const toUsd = toAmt * tokenTo.usdPer;
+    toUsdEl.textContent = `≈$${toUsd.toFixed(2)}`;
+
+    const minReceived = toAmt * (1 - slippagePercent / 100);
+    minRecvEl.textContent = `${minReceived.toFixed(8)} ${tokenTo.symbol}`;
+  }
+
+  flipBtn.addEventListener('click', () => {
+    [tokenFrom, tokenTo] = [tokenTo, tokenFrom];
+    const icons = document.querySelectorAll('.token-icon');
+    icons[0].classList.toggle('icon-usdt');
+    icons[0].classList.toggle('icon-btc');
+    icons[1].classList.toggle('icon-usdt');
+    icons[1].classList.toggle('icon-btc');
+
+    document.querySelectorAll('.token-name')[0].childNodes[0].textContent = tokenFrom.symbol + " ";
+    document.querySelectorAll('.token-sub')[0].textContent = tokenFrom.symbol === 'USDT' ? 'Tether USDT' : (tokenFrom.symbol === 'BTC' ? 'Bitcoin' : '');
+    document.querySelectorAll('.token-name')[1].childNodes[0].textContent = tokenTo.symbol + " ";
+    document.querySelectorAll('.token-sub')[1].textContent = tokenTo.symbol === 'BTC' ? 'Bitcoin' : (tokenTo.symbol === 'USDT' ? 'Tether USDT' : '');
+
+    flipBtn.setAttribute('aria-pressed', flipBtn.getAttribute('aria-pressed') === 'true' ? 'false' : 'true');
+    updateUI();
+  });
+
+  fromInput.addEventListener('input', updateUI);
+
+  swapBtn.addEventListener('click', (e) => {
+    e.preventDefault();
+    const fromAmt = parseFloat(fromInput.value) || 0;
+    if(fromAmt <= 0){ alert('Enter an amount to swap.'); fromInput.focus(); return; }
+    const rate = computeRate();
+    const toAmt = fromAmt * rate;
+    const minReceived = toAmt * (1 - slippagePercent/100);
+    const confirmMsg = `Swap ${fromAmt} ${tokenFrom.symbol} → ${toAmt.toFixed(8)} ${tokenTo.symbol}\nMin Received (after ${slippagePercent}% slippage): ${minReceived.toFixed(8)} ${tokenTo.symbol}\n\nProceed?`;
+    if(confirm(confirmMsg)){
+      alert('Swap executed (demo).');
+    }
+  });
+
+  (function seedForScreenshot(){
+    const desiredTo = 0.00509437;
+    const fromVal = parseFloat(fromInput.value) || 200;
+    const impliedRate = desiredTo / fromVal;
+    tokenFrom.usdPer = 1.00005;
+    tokenTo.usdPer = tokenFrom.usdPer / impliedRate;
+  })();
+
+  updateUI();
+})();
+</script>
 </body>
 </html>
