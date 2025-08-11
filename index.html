@@ -170,24 +170,16 @@
     outline:none;
   }
 
-  /* small screen tweaks */
   @media (max-width:420px){
     .container{ padding:12px; }
     .token-icon{ min-width:48px;height:48px;font-size:18px;border-radius:10px; }
     .amount{ font-size:18px; min-width:88px; }
   }
 
-  /* visual variants for different tokens (coloring) */
   .icon-usdt{ background: linear-gradient(135deg,#0aa37d,#00c176); }
   .icon-btc{ background: linear-gradient(135deg,#f59e0b,#f97316); }
   .token-card{ background: linear-gradient(180deg, rgba(255,255,255,0.6), rgba(250,250,250,0.6)); }
   .muted-ghost{ color:#b7bec6; font-size:12px; }
-
-  .route-logo{
-    display:inline-flex;
-    width:20px;height:20px;border-radius:6px;align-items:center;justify-content:center;
-    background:#0b1726;color:white;font-weight:700;font-size:11px;margin-right:8px;
-  }
 
   label{ font-size:12px; color:var(--muted); display:block; margin-bottom:6px; }
   .flex-between{ display:flex; justify-content:space-between; align-items:center; gap:10px; }
@@ -253,12 +245,9 @@
     <div class="details" aria-hidden="false">
       <div class="detail-row">
         <div class="flex-between" style="flex:1">
-          <div class="flex">
-            <span class="route-logo" title="Binance">B</span>
-            <div style="font-weight:600">Route</div>
-          </div>
+          <div style="font-weight:600">Route</div>
         </div>
-        <div style="color:var(--muted);font-size:13px">Binance</div>
+        <div style="color:#000000;font-size:13px">Binance</div>
       </div>
 
       <div class="detail-row">
@@ -284,118 +273,87 @@
   </div>
 
 <script>
-  // Mock starting rate: 1 USDT = rate BTC (example value)
-  // We'll compute toAmount = fromAmount * rate
-  // The numbers mirror the screenshot-ish values (just for demo).
-  (function(){
-    const fromInput = document.getElementById('fromAmount');
-    const toAmountEl = document.getElementById('toAmount');
-    const fromUsdEl = document.getElementById('fromUsd');
-    const toUsdEl = document.getElementById('toUsd');
-    const rateText = document.getElementById('rateText');
-    const minRecvEl = document.getElementById('minRecv');
-    const flipBtn = document.getElementById('flipBtn');
-    const swapBtn = document.getElementById('swapBtn');
+(function(){
+  const fromInput = document.getElementById('fromAmount');
+  const toAmountEl = document.getElementById('toAmount');
+  const fromUsdEl = document.getElementById('fromUsd');
+  const toUsdEl = document.getElementById('toUsd');
+  const rateText = document.getElementById('rateText');
+  const minRecvEl = document.getElementById('minRecv');
+  const flipBtn = document.getElementById('flipBtn');
+  const swapBtn = document.getElementById('swapBtn');
 
-    // Start tokens (simple object)
-    let tokenFrom = { symbol: 'USDT', usdPer: 1 }; // 1 USDT ≈ $1
-    let tokenTo   = { symbol: 'BTC', usdPer: 118000 }; // example BTC price in USD
-    // Derived rate:
-    function computeRate(){
-      // 1 FROM unit = (usdPer(from) / usdPer(to)) TO units
-      return tokenFrom.usdPer / tokenTo.usdPer;
-    }
+  let tokenFrom = { symbol: 'USDT', usdPer: 1 };
+  let tokenTo   = { symbol: 'BTC', usdPer: 118000 };
 
-    // initialize example values to match screenshot vibe
-    tokenFrom.usdPer = 1.00005;             // small fractional difference
-    tokenTo.usdPer = 118000;                // BTC price -- adjust as needed
-    let slippagePercent = 1;                // 1%
-    let tradingFeeFree = true;
+  function computeRate(){
+    return tokenFrom.usdPer / tokenTo.usdPer;
+  }
 
-    function updateUI(){
-      const rate = computeRate();
-      // format rate: 1 USDT -> x BTC
-      rateText.textContent = `1 ${tokenFrom.symbol} ≈ ${rate.toFixed(10)} ${tokenTo.symbol}`;
+  tokenFrom.usdPer = 1.00005;
+  tokenTo.usdPer = 118000;
+  let slippagePercent = 1;
 
-      const fromAmt = parseFloat(fromInput.value) || 0;
-      const toAmt = fromAmt * rate;
-      // display to amount with 8 decimals typical for BTC
-      toAmountEl.textContent = toAmt === 0 ? '0.00000000' : toAmt.toFixed(8);
+  function updateUI(){
+    const rate = computeRate();
+    rateText.textContent = `1 ${tokenFrom.symbol} ≈ ${rate.toFixed(10)} ${tokenTo.symbol}`;
 
-      // USD approximations
-      const fromUsd = fromAmt * tokenFrom.usdPer;
-      fromUsdEl.textContent = `≈$${fromUsd.toFixed(2)}`;
+    const fromAmt = parseFloat(fromInput.value) || 0;
+    const toAmt = fromAmt * rate;
+    toAmountEl.textContent = toAmt === 0 ? '0.00000000' : toAmt.toFixed(8);
 
-      const toUsd = toAmt * tokenTo.usdPer;
-      toUsdEl.textContent = `≈$${toUsd.toFixed(2)}`;
+    const fromUsd = fromAmt * tokenFrom.usdPer;
+    fromUsdEl.textContent = `≈$${fromUsd.toFixed(2)}`;
 
-      // Min Received considering slippage
-      const minReceived = toAmt * (1 - slippagePercent / 100);
-      minRecvEl.textContent = `${minReceived.toFixed(8)} ${tokenTo.symbol}`;
-    }
+    const toUsd = toAmt * tokenTo.usdPer;
+    toUsdEl.textContent = `≈$${toUsd.toFixed(2)}`;
 
-    // flip tokens
-    flipBtn.addEventListener('click', () => {
-      // swap token objects
-      [tokenFrom, tokenTo] = [tokenTo, tokenFrom];
+    const minReceived = toAmt * (1 - slippagePercent / 100);
+    minRecvEl.textContent = `${minReceived.toFixed(8)} ${tokenTo.symbol}`;
+  }
 
-      // update icons and labels (for demo we just swap the visible icons' colors/text)
-      // In a real app you'd re-render token icons, names, and input placeholders.
-      // Swap visual icons by changing classes:
-      const icons = document.querySelectorAll('.token-icon');
-      icons[0].classList.toggle('icon-usdt');
-      icons[0].classList.toggle('icon-btc');
-      icons[1].classList.toggle('icon-usdt');
-      icons[1].classList.toggle('icon-btc');
+  flipBtn.addEventListener('click', () => {
+    [tokenFrom, tokenTo] = [tokenTo, tokenFrom];
+    const icons = document.querySelectorAll('.token-icon');
+    icons[0].classList.toggle('icon-usdt');
+    icons[0].classList.toggle('icon-btc');
+    icons[1].classList.toggle('icon-usdt');
+    icons[1].classList.toggle('icon-btc');
 
-      // Swap token text names (simple approach):
-      document.querySelectorAll('.token-name')[0].childNodes[0].textContent = tokenFrom.symbol + " ";
-      document.querySelectorAll('.token-sub')[0].textContent = tokenFrom.symbol === 'USDT' ? 'Tether USDT' : (tokenFrom.symbol === 'BTC' ? 'Bitcoin' : '');
-      document.querySelectorAll('.token-name')[1].childNodes[0].textContent = tokenTo.symbol + " ";
-      document.querySelectorAll('.token-sub')[1].textContent = tokenTo.symbol === 'BTC' ? 'Bitcoin' : (tokenTo.symbol === 'USDT' ? 'Tether USDT' : '');
+    document.querySelectorAll('.token-name')[0].childNodes[0].textContent = tokenFrom.symbol + " ";
+    document.querySelectorAll('.token-sub')[0].textContent = tokenFrom.symbol === 'USDT' ? 'Tether USDT' : (tokenFrom.symbol === 'BTC' ? 'Bitcoin' : '');
+    document.querySelectorAll('.token-name')[1].childNodes[0].textContent = tokenTo.symbol + " ";
+    document.querySelectorAll('.token-sub')[1].textContent = tokenTo.symbol === 'BTC' ? 'Bitcoin' : (tokenTo.symbol === 'USDT' ? 'Tether USDT' : '');
 
-      // flip aria-pressed
-      flipBtn.setAttribute('aria-pressed', flipBtn.getAttribute('aria-pressed') === 'true' ? 'false' : 'true');
-
-      // After swapping tokens, update UI values: treat fromAmount input as same numeric value but units changed.
-      updateUI();
-    });
-
-    // update on input change
-    fromInput.addEventListener('input', updateUI);
-
-    // simulate swap button (simple confirmation)
-    swapBtn.addEventListener('click', (e) => {
-      e.preventDefault();
-      const fromAmt = parseFloat(fromInput.value) || 0;
-      if(fromAmt <= 0){ alert('Enter an amount to swap.'); fromInput.focus(); return; }
-      const rate = computeRate();
-      const toAmt = fromAmt * rate;
-      const minReceived = toAmt * (1 - slippagePercent/100);
-      const confirmMsg = `Swap ${fromAmt} ${tokenFrom.symbol} → ${toAmt.toFixed(8)} ${tokenTo.symbol}\nMin Received (after ${slippagePercent}% slippage): ${minReceived.toFixed(8)} ${tokenTo.symbol}\n\nProceed?`;
-      if(confirm(confirmMsg)){
-        // mock success
-        alert('Swap executed (demo).');
-      }
-    });
-
-    // initial render
-    // To match the screenshot numbers roughly:
-    // If we want 200 USDT => 0.00509437 BTC, the implied rate = 0.00509437 / 200 = 0.00002547185
-    // But screenshot had different numbers — this demo uses the computeRate approach based on usdPer.
-    // We'll set BTC price to produce a similar toAmount:
-    (function seedForScreenshot(){
-      // choose values so 200 USDT -> ~0.00509437 BTC:
-      const desiredTo = 0.00509437;
-      const fromVal = parseFloat(fromInput.value) || 200;
-      const impliedRate = desiredTo / fromVal; // ~0.00002547185
-      // choose tokenTo.usdPer so that rate = tokenFrom.usdPer / tokenTo.usdPer
-      tokenFrom.usdPer = 1.00005;
-      tokenTo.usdPer = tokenFrom.usdPer / impliedRate;
-    })();
-
+    flipBtn.setAttribute('aria-pressed', flipBtn.getAttribute('aria-pressed') === 'true' ? 'false' : 'true');
     updateUI();
+  });
+
+  fromInput.addEventListener('input', updateUI);
+
+  swapBtn.addEventListener('click', (e) => {
+    e.preventDefault();
+    const fromAmt = parseFloat(fromInput.value) || 0;
+    if(fromAmt <= 0){ alert('Enter an amount to swap.'); fromInput.focus(); return; }
+    const rate = computeRate();
+    const toAmt = fromAmt * rate;
+    const minReceived = toAmt * (1 - slippagePercent/100);
+    const confirmMsg = `Swap ${fromAmt} ${tokenFrom.symbol} → ${toAmt.toFixed(8)} ${tokenTo.symbol}\nMin Received (after ${slippagePercent}% slippage): ${minReceived.toFixed(8)} ${tokenTo.symbol}\n\nProceed?`;
+    if(confirm(confirmMsg)){
+      alert('Swap executed (demo).');
+    }
+  });
+
+  (function seedForScreenshot(){
+    const desiredTo = 0.00509437;
+    const fromVal = parseFloat(fromInput.value) || 200;
+    const impliedRate = desiredTo / fromVal;
+    tokenFrom.usdPer = 1.00005;
+    tokenTo.usdPer = tokenFrom.usdPer / impliedRate;
   })();
+
+  updateUI();
+})();
 </script>
 </body>
 </html>
