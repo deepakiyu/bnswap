@@ -1,191 +1,339 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Crypto Swap UI</title>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Swap UI — Pixel Match</title>
+
+<!-- Use Inter (close match to modern mobile UI fonts). If you prefer another font replace the link. -->
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+
 <style>
-body {
-    font-family: Arial, sans-serif;
-    background-color: #fff;
-    margin: 0;
-    padding: 0;
-    display: flex;
-    justify-content: center;
-}
+  /* Root / reset */
+  :root{
+    --bg:#ffffff;
+    --muted:#9aa0a6;
+    --card:#fbfbfb;
+    --shadow: 0 10px 24px rgba(15,20,25,0.06);
+    --radius:14px;
+    --accent:#f6c02d; /* main yellow */
+    --accent-dark:#f0b700;
+    --inner-shadow: rgba(0,0,0,0.02);
+    --text:#0f1720;
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%;margin:0;background:var(--bg);-webkit-font-smoothing:antialiased;font-family: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;}
+  /* Center container to mimic mobile screen area */
+  .wrap{
+    width:375px; /* mobile width as requested */
+    margin:0 auto;
+    padding:18px 16px 36px;
+  }
 
-.container {
-    width: 375px; /* same width as screenshot */
-    padding: 20px;
-}
+  /* Top spacing (statusbar gap) */
+  .status-gap{height:10px;}
 
-h2 {
-    font-size: 18px;
-    font-weight: bold;
-    margin-bottom: 15px;
-}
+  h1{
+    font-size:18px;
+    font-weight:700;
+    color:var(--text);
+    margin:6px 0 14px;
+  }
 
-.card {
-    background-color: #f9f9f9;
-    border-radius: 14px;
-    padding: 15px;
-    margin-bottom: 10px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
+  /* Card styling for From / To */
+  .card{
+    background: linear-gradient(180deg, #ffffff, #fbfbfc);
+    border-radius:14px;
+    box-shadow: var(--shadow);
+    padding:14px 16px;
+    margin-bottom:18px;
+    border: 1px solid rgba(15,20,25,0.03);
+  }
 
-.token-info {
-    display: flex;
-    align-items: center;
-}
+  label.small{
+    display:block;
+    color:var(--muted);
+    font-size:12px;
+    margin-bottom:6px;
+    font-weight:500;
+  }
 
-.token-icon {
-    width: 36px;
-    height: 36px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: white;
-    font-size: 14px;
-    margin-right: 10px;
-}
+  .row{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+  }
 
-.icon-usdt { background-color: #26a17b; }
-.icon-btc { background-color: #f7931a; }
+  .left{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    min-width:0;
+  }
 
-.token-text {
-    display: flex;
-    flex-direction: column;
-}
+  /* token icon */
+  .token-icon{
+    width:52px;
+    height:52px;
+    border-radius:12px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    color:white;
+    font-weight:800;
+    font-size:22px;
+    flex-shrink:0;
+    box-shadow: 0 6px 14px rgba(0,0,0,0.06);
+  }
+  .icon-usdt{ background: linear-gradient(135deg,#0aa48f,#00b38a); } /* teal */
+  .icon-btc{ background: linear-gradient(135deg,#f9a829,#f37c1a); }   /* orange */
 
-.token-name {
-    font-weight: bold;
-    font-size: 14px;
-}
+  .token-meta{
+    min-width:0;
+  }
+  .token-title{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    font-weight:800;
+    font-size:18px;
+    color:var(--text);
+  }
+  .token-sub{
+    font-size:13px;
+    color:var(--muted);
+    margin-top:6px;
+    font-weight:500;
+  }
 
-.token-sub {
-    font-size: 12px;
-    color: gray;
-}
+  /* Amount block on right */
+  .amount-block{
+    text-align:right;
+    min-width:120px;
+  }
+  .amount-main{
+    font-size:22px;
+    font-weight:800;
+    color:var(--text);
+    line-height:1;
+  }
+  .amount-sub{
+    margin-top:6px;
+    font-size:13px;
+    color:var(--muted);
+    font-weight:500;
+  }
+  .max-label{
+    display:block;
+    margin-top:10px;
+    color:#f5a623;
+    font-weight:700;
+    font-size:13px;
+    text-align:right;
+  }
 
-.amount-section {
-    text-align: right;
-}
+  /* overlapping circular swap control */
+  .flip-wrap{
+    display:flex;
+    justify-content:center;
+    transform: translateY(-18px);
+    margin-bottom:-18px;
+    z-index:5;
+  }
+  .flip-circle{
+    width:44px;
+    height:44px;
+    border-radius:50%;
+    background:#fff;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    box-shadow: 0 8px 18px rgba(10,12,14,0.06);
+    border:1px solid rgba(15,20,25,0.04);
+    font-weight:700;
+    color:var(--text);
+    font-size:20px;
+  }
 
-.amount {
-    font-size: 18px;
-    font-weight: bold;
-}
+  /* Big Swap button (rounded pill) */
+  .swap-btn{
+    margin:22px 0;
+    width:100%;
+    height:54px;
+    background:linear-gradient(180deg,var(--accent),var(--accent-dark));
+    border-radius:999px;
+    border:none;
+    font-weight:700;
+    font-size:18px;
+    color:#111;
+    box-shadow:0 10px 28px rgba(240,170,0,0.14);
+    cursor:pointer;
+  }
 
-.amount-sub {
-    font-size: 12px;
-    color: gray;
-}
+  /* details area similar to screenshot */
+  .details{
+    margin-top:6px;
+    padding-top:8px;
+    color:var(--muted);
+    font-size:13px;
+    line-height:1.6;
+  }
+  .detail-row{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:8px 0;
+    border-bottom: none;
+  }
+  .detail-left{
+    color:var(--muted);
+    font-weight:600;
+    font-size:13px;
+  }
+  .detail-right{
+    text-align:right;
+    color:var(--text);
+    font-weight:700;
+    font-size:13px;
+  }
 
-.swap-icon {
-    text-align: center;
-    margin: 10px 0;
-    font-size: 20px;
-}
+  /* Small sub style for rate text (lighter) */
+  .rate-small{ font-weight:600; color:#333; font-size:13px; }
 
-.swap-button {
-    background-color: #f0b90b;
-    border: none;
-    width: 100%;
-    padding: 14px;
-    border-radius: 25px;
-    font-size: 16px;
-    font-weight: bold;
-    cursor: pointer;
-}
+  /* Free pill */
+  .pill{
+    display:inline-block;
+    padding:4px 8px;
+    border-radius:8px;
+    background:#e8f7ee;
+    color:#0b7b3a;
+    font-weight:700;
+    font-size:12px;
+    margin-left:8px;
+  }
 
-.details {
-    font-size: 12px;
-    color: gray;
-    margin-top: 15px;
-}
+  /* mimic dotted subtle divider under first card (screenshot has faint line) */
+  .divider{
+    height:10px;
+    background: linear-gradient(180deg, rgba(0,0,0,0.015), rgba(0,0,0,0));
+    margin-top:12px;
+    border-radius:8px;
+  }
 
-.details-row {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 6px;
-}
+  /* tiny right chevron for route */
+  .chev{
+    width:12px;height:12px;display:inline-block;margin-left:8px;opacity:0.6;
+    border-right:2px solid rgba(0,0,0,0.45);
+    border-top:2px solid rgba(0,0,0,0.45);
+    transform: rotate(45deg);
+  }
 
-.details-row .highlight {
-    color: black;
-    font-weight: bold;
-}
-
-.details-row .tag {
-    background-color: #dff5e3;
-    color: #2e7d32;
-    padding: 2px 6px;
-    border-radius: 6px;
-    font-size: 11px;
-    font-weight: bold;
-}
+  /* small responsive tweaks for desktop viewing */
+  @media(min-width:800px){
+    body{ background: linear-gradient(#fff,#fff); }
+    .wrap{ margin-top:20px; box-shadow: none; }
+  }
 </style>
 </head>
 <body>
-<div class="container">
-    <h2>Swap</h2>
+  <div class="wrap" role="main" aria-label="Swap UI">
+    <div class="status-gap" aria-hidden="true"></div>
+    <h1>Swap</h1>
 
-    <div class="card">
-        <div class="token-info">
-            <div class="token-icon icon-usdt">₮</div>
-            <div class="token-text">
-                <div class="token-name">USDT</div>
-                <div class="token-sub">Tether USDT</div>
-            </div>
+    <!-- FROM -->
+    <label class="small">From</label>
+    <div class="card" aria-hidden="false">
+      <div class="row" style="align-items:flex-start;">
+        <div class="left">
+          <div class="token-icon icon-usdt" aria-hidden="true">
+            <!-- USDT short mark -->
+            ₮
+          </div>
+          <div class="token-meta">
+            <div class="token-title">USDT <span style="font-weight:700;font-size:14px;color:rgba(0,0,0,0.45)">▾</span></div>
+            <div class="token-sub">Tether USDT</div>
+          </div>
         </div>
-        <div class="amount-section">
-            <div class="amount">200</div>
+
+        <div style="flex:0 0 140px;">
+          <div class="amount-block">
+            <div class="amount-main">200</div>
             <div class="amount-sub">≈$200.01</div>
+            <div class="max-label">Max</div>
+          </div>
         </div>
+      </div>
+
+      <div class="divider" aria-hidden="true"></div>
     </div>
 
-    <div class="swap-icon">⇅</div>
+    <!-- flip control -->
+    <div class="flip-wrap">
+      <div class="flip-circle" title="Flip">⇅</div>
+    </div>
 
+    <!-- TO -->
+    <label class="small">To</label>
     <div class="card">
-        <div class="token-info">
-            <div class="token-icon icon-btc">₿</div>
-            <div class="token-text">
-                <div class="token-name">BTC</div>
-                <div class="token-sub">Bitcoin</div>
-            </div>
+      <div class="row">
+        <div class="left">
+          <div class="token-icon icon-btc">฿</div>
+          <div class="token-meta">
+            <div class="token-title">BTC <span style="font-weight:700;font-size:14px;color:rgba(0,0,0,0.45)">▾</span></div>
+            <div class="token-sub">Bitcoin</div>
+          </div>
         </div>
-        <div class="amount-section">
-            <div class="amount">0.00509437</div>
+
+        <div style="flex:0 0 140px;">
+          <div class="amount-block">
+            <div class="amount-main">0.00509437</div>
             <div class="amount-sub">≈$600.63</div>
+          </div>
         </div>
+      </div>
     </div>
 
-    <button class="swap-button">Swap</button>
+    <!-- Swap button (large pill) -->
+    <button class="swap-btn" aria-label="Swap">Swap</button>
 
-    <div class="details">
-        <div class="details-row">
-            <span>Route</span>
-            <span class="highlight">Binance</span>
+    <!-- Details section (with Binance logo inline SVG to match screenshot) -->
+    <div class="details" role="list">
+      <div class="detail-row" role="listitem">
+        <div class="detail-left">Route</div>
+        <div class="detail-right" style="display:flex;align-items:center;justify-content:flex-end;gap:8px;">
+          <!-- Inline Binance-like SVG mark (visual reference only) -->
+          <svg width="20" height="20" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <rect width="24" height="24" rx="4" fill="#f3b61a"/>
+            <g fill="#111827" transform="translate(2,2) scale(0.8)">
+              <path d="M10 3.2L12.4 5.6 10 8 7.6 5.6 10 3.2zM3.2 10L5.6 12.4 8 10 5.6 7.6 3.2 10zM16 10L18.4 12.4 20.8 10 18.4 7.6 16 10zM10 16.8L12.4 14.4 10 12 7.6 14.4 10 16.8zM12.8 10L10 12.8 7.2 10 10 7.2 12.8 10z"/>
+            </g>
+          </svg>
+          <span style="font-weight:700;">Binance</span>
+          <span class="chev" aria-hidden="true"></span>
         </div>
-        <div class="details-row">
-            <span>Rate</span>
-            <span>1 USDT ≈ 0.0000084204 BTC</span>
-        </div>
-        <div class="details-row">
-            <span>Slippage</span>
-            <span>Auto | 1%</span>
-        </div>
-        <div class="details-row">
-            <span>Min. Received</span>
-            <span>0.0050434 BTC</span>
-        </div>
-        <div class="details-row">
-            <span>Trading Fee</span>
-            <span><s>0.5%</s> <span class="tag">Free</span></span>
-        </div>
+      </div>
+
+      <div class="detail-row">
+        <div class="detail-left">Rate</div>
+        <div class="detail-right rate-small">1 USDT ≈ 0.0000084204 BTC</div>
+      </div>
+
+      <div class="detail-row">
+        <div class="detail-left">Slippage</div>
+        <div class="detail-right rate-small">Auto | 1%</div>
+      </div>
+
+      <div class="detail-row">
+        <div class="detail-left">Min. Received</div>
+        <div class="detail-right">0.0050434 BTC</div>
+      </div>
+
+      <div class="detail-row">
+        <div class="detail-left">Trading Fee</div>
+        <div class="detail-right"><s style="color:rgba(0,0,0,0.4)">0.5%</s> <span class="pill">Free</span></div>
+      </div>
     </div>
-</div>
+  </div>
 </body>
-</html>L
+</html>
