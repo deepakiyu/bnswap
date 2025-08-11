@@ -3,337 +3,399 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Swap UI — Pixel Match</title>
-
-<!-- Use Inter (close match to modern mobile UI fonts). If you prefer another font replace the link. -->
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
-
+<title>Swap UI — Demo</title>
 <style>
-  /* Root / reset */
   :root{
     --bg:#ffffff;
+    --card:#f7f7f8;
     --muted:#9aa0a6;
-    --card:#fbfbfb;
-    --shadow: 0 10px 24px rgba(15,20,25,0.06);
-    --radius:14px;
-    --accent:#f6c02d; /* main yellow */
+    --accent:#f6c02d;
     --accent-dark:#f0b700;
-    --inner-shadow: rgba(0,0,0,0.02);
-    --text:#0f1720;
-  }
-  *{box-sizing:border-box}
-  html,body{height:100%;margin:0;background:var(--bg);-webkit-font-smoothing:antialiased;font-family: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;}
-  /* Center container to mimic mobile screen area */
-  .wrap{
-    width:375px; /* mobile width as requested */
-    margin:0 auto;
-    padding:18px 16px 36px;
+    --radius:14px;
+    --shadow: 0 6px 18px rgba(22,28,37,0.06);
+    --glass: linear-gradient(180deg, rgba(255,255,255,0.9), rgba(250,250,251,0.9));
+    font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
   }
 
-  /* Top spacing (statusbar gap) */
-  .status-gap{height:10px;}
+  html,body{
+    height:100%;
+    margin:0;
+    background:linear-gradient(180deg,#fff 0%, #fafafa 100%);
+    color:#111827;
+    -webkit-font-smoothing:antialiased;
+    -moz-osx-font-smoothing:grayscale;
+  }
+
+  .container{
+    max-width:420px;
+    margin:28px auto;
+    padding:20px;
+  }
 
   h1{
-    font-size:18px;
-    font-weight:700;
-    color:var(--text);
-    margin:6px 0 14px;
+    font-size:20px;
+    margin:12px 0 18px;
+    font-weight:600;
   }
 
-  /* Card styling for From / To */
   .card{
-    background: linear-gradient(180deg, #ffffff, #fbfbfc);
-    border-radius:14px;
-    box-shadow: var(--shadow);
-    padding:14px 16px;
-    margin-bottom:18px;
-    border: 1px solid rgba(15,20,25,0.03);
+    background:var(--card);
+    border-radius:var(--radius);
+    padding:14px;
+    box-shadow:var(--shadow);
+    margin-bottom:12px;
+    position:relative;
+    overflow:hidden;
   }
 
-  label.small{
-    display:block;
-    color:var(--muted);
-    font-size:12px;
-    margin-bottom:6px;
-    font-weight:500;
-  }
-
-  .row{
+  .token-row{
     display:flex;
-    align-items:center;
-    justify-content:space-between;
     gap:12px;
+    align-items:center;
   }
 
-  .left{
-    display:flex;
-    align-items:center;
-    gap:12px;
-    min-width:0;
-  }
-
-  /* token icon */
   .token-icon{
-    width:52px;
-    height:52px;
+    min-width:56px;
+    height:56px;
+    background:linear-gradient(135deg,#0ea5a3,#34d399);
     border-radius:12px;
     display:flex;
     align-items:center;
     justify-content:center;
     color:white;
-    font-weight:800;
-    font-size:22px;
+    font-weight:700;
+    font-size:20px;
+    box-shadow:0 4px 10px rgba(10,10,10,0.06);
     flex-shrink:0;
-    box-shadow: 0 6px 14px rgba(0,0,0,0.06);
   }
-  .icon-usdt{ background: linear-gradient(135deg,#0aa48f,#00b38a); } /* teal */
-  .icon-btc{ background: linear-gradient(135deg,#f9a829,#f37c1a); }   /* orange */
 
-  .token-meta{
-    min-width:0;
+  .token-info{
+    flex:1;
   }
+
   .token-title{
     display:flex;
     align-items:center;
+    justify-content:space-between;
     gap:8px;
-    font-weight:800;
-    font-size:18px;
-    color:var(--text);
   }
+
+  .token-name{
+    font-size:16px;
+    font-weight:700;
+  }
+
   .token-sub{
     font-size:13px;
     color:var(--muted);
     margin-top:6px;
-    font-weight:500;
   }
 
-  /* Amount block on right */
-  .amount-block{
-    text-align:right;
-    min-width:120px;
-  }
-  .amount-main{
-    font-size:22px;
-    font-weight:800;
-    color:var(--text);
-    line-height:1;
-  }
-  .amount-sub{
-    margin-top:6px;
-    font-size:13px;
-    color:var(--muted);
-    font-weight:500;
-  }
-  .max-label{
-    display:block;
-    margin-top:10px;
-    color:#f5a623;
-    font-weight:700;
-    font-size:13px;
-    text-align:right;
-  }
-
-  /* overlapping circular swap control */
-  .flip-wrap{
-    display:flex;
-    justify-content:center;
-    transform: translateY(-18px);
-    margin-bottom:-18px;
-    z-index:5;
-  }
-  .flip-circle{
-    width:44px;
-    height:44px;
-    border-radius:50%;
-    background:#fff;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    box-shadow: 0 8px 18px rgba(10,12,14,0.06);
-    border:1px solid rgba(15,20,25,0.04);
-    font-weight:700;
-    color:var(--text);
+  .amount{
     font-size:20px;
-  }
-
-  /* Big Swap button (rounded pill) */
-  .swap-btn{
-    margin:22px 0;
-    width:100%;
-    height:54px;
-    background:linear-gradient(180deg,var(--accent),var(--accent-dark));
-    border-radius:999px;
-    border:none;
     font-weight:700;
-    font-size:18px;
-    color:#111;
-    box-shadow:0 10px 28px rgba(240,170,0,0.14);
-    cursor:pointer;
+    text-align:right;
+    min-width:110px;
   }
 
-  /* details area similar to screenshot */
-  .details{
-    margin-top:6px;
-    padding-top:8px;
+  .small-muted{
+    font-size:12px;
     color:var(--muted);
-    font-size:13px;
-    line-height:1.6;
+    text-align:right;
+    margin-top:6px;
   }
+
+  .swap-flip{
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    margin: -20px 0 8px;
+    z-index:2;
+  }
+
+  .circle{
+    width:48px;height:48px;border-radius:50%;
+    background:white;box-shadow:0 6px 14px rgba(10,10,10,0.06);
+    display:flex;align-items:center;justify-content:center;font-weight:700;
+    transform: rotate(0deg);
+  }
+
+  .action{
+    margin-top:10px;
+  }
+
+  .btn-swap{
+    width:100%;
+    background:linear-gradient(180deg,var(--accent) 0%, var(--accent-dark) 100%);
+    color:#111827;
+    border:none;
+    padding:16px 18px;
+    border-radius:999px;
+    font-weight:700;
+    font-size:16px;
+    cursor:pointer;
+    box-shadow:0 8px 24px rgba(240,180,0,0.18);
+  }
+
+  .details{
+    margin-top:14px;
+    padding:10px 6px;
+    font-size:14px;
+    color:var(--muted);
+  }
+
   .detail-row{
     display:flex;
     justify-content:space-between;
+    padding:8px 4px;
     align-items:center;
-    padding:8px 0;
-    border-bottom: none;
-  }
-  .detail-left{
-    color:var(--muted);
-    font-weight:600;
-    font-size:13px;
-  }
-  .detail-right{
-    text-align:right;
-    color:var(--text);
-    font-weight:700;
-    font-size:13px;
   }
 
-  /* Small sub style for rate text (lighter) */
-  .rate-small{ font-weight:600; color:#333; font-size:13px; }
-
-  /* Free pill */
-  .pill{
-    display:inline-block;
+  .tag{
+    background:#eef8ff;
+    color:#0b66ff;
     padding:4px 8px;
-    border-radius:8px;
-    background:#e8f7ee;
-    color:#0b7b3a;
-    font-weight:700;
+    border-radius:10px;
     font-size:12px;
-    margin-left:8px;
+    font-weight:600;
   }
 
-  /* mimic dotted subtle divider under first card (screenshot has faint line) */
-  .divider{
-    height:10px;
-    background: linear-gradient(180deg, rgba(0,0,0,0.015), rgba(0,0,0,0));
-    margin-top:12px;
-    border-radius:8px;
+  input[type="number"]{
+    width:100%;
+    border:none;
+    background:transparent;
+    font-size:20px;
+    text-align:right;
+    font-weight:700;
+    outline:none;
   }
 
-  /* tiny right chevron for route */
-  .chev{
-    width:12px;height:12px;display:inline-block;margin-left:8px;opacity:0.6;
-    border-right:2px solid rgba(0,0,0,0.45);
-    border-top:2px solid rgba(0,0,0,0.45);
-    transform: rotate(45deg);
+  /* small screen tweaks */
+  @media (max-width:420px){
+    .container{ padding:12px; }
+    .token-icon{ min-width:48px;height:48px;font-size:18px;border-radius:10px; }
+    .amount{ font-size:18px; min-width:88px; }
   }
 
-  /* small responsive tweaks for desktop viewing */
-  @media(min-width:800px){
-    body{ background: linear-gradient(#fff,#fff); }
-    .wrap{ margin-top:20px; box-shadow: none; }
+  /* visual variants for different tokens (coloring) */
+  .icon-usdt{ background: linear-gradient(135deg,#0aa37d,#00c176); }
+  .icon-btc{ background: linear-gradient(135deg,#f59e0b,#f97316); }
+  .token-card{ background: linear-gradient(180deg, rgba(255,255,255,0.6), rgba(250,250,250,0.6)); }
+  .muted-ghost{ color:#b7bec6; font-size:12px; }
+
+  .route-logo{
+    display:inline-flex;
+    width:20px;height:20px;border-radius:6px;align-items:center;justify-content:center;
+    background:#0b1726;color:white;font-weight:700;font-size:11px;margin-right:8px;
   }
+
+  label{ font-size:12px; color:var(--muted); display:block; margin-bottom:6px; }
+  .flex-between{ display:flex; justify-content:space-between; align-items:center; gap:10px; }
 </style>
 </head>
 <body>
-  <div class="wrap" role="main" aria-label="Swap UI">
-    <div class="status-gap" aria-hidden="true"></div>
-    <h1>Swap</h1>
+  <div class="container" role="main" aria-labelledby="swapTitle">
+    <h1 id="swapTitle">Swap</h1>
 
-    <!-- FROM -->
-    <label class="small">From</label>
-    <div class="card" aria-hidden="false">
-      <div class="row" style="align-items:flex-start;">
-        <div class="left">
-          <div class="token-icon icon-usdt" aria-hidden="true">
-            <!-- USDT short mark -->
-            ₮
-          </div>
-          <div class="token-meta">
-            <div class="token-title">USDT <span style="font-weight:700;font-size:14px;color:rgba(0,0,0,0.45)">▾</span></div>
-            <div class="token-sub">Tether USDT</div>
-          </div>
-        </div>
-
-        <div style="flex:0 0 140px;">
-          <div class="amount-block">
-            <div class="amount-main">200</div>
-            <div class="amount-sub">≈$200.01</div>
-            <div class="max-label">Max</div>
+    <!-- From card -->
+    <div class="card token-card" aria-label="From token">
+      <label>From</label>
+      <div class="token-row">
+        <div class="token-icon icon-usdt" aria-hidden="true">₮</div>
+        <div class="token-info">
+          <div class="token-title">
+            <div>
+              <div class="token-name">USDT <small style="font-weight:600;color:var(--muted);font-size:12px">▼</small></div>
+              <div class="token-sub">Tether USDT</div>
+            </div>
+            <div style="width:140px;">
+              <div class="amount">
+                <input id="fromAmount" type="number" min="0" step="0.01" value="200" aria-label="From amount" />
+              </div>
+              <div class="small-muted" id="fromUsd">≈$200.00</div>
+            </div>
           </div>
         </div>
       </div>
-
-      <div class="divider" aria-hidden="true"></div>
     </div>
 
     <!-- flip control -->
-    <div class="flip-wrap">
-      <div class="flip-circle" title="Flip">⇅</div>
+    <div class="swap-flip">
+      <div class="circle" title="Flip tokens" id="flipBtn" role="button" aria-pressed="false" aria-label="Flip tokens">⇅</div>
     </div>
 
-    <!-- TO -->
-    <label class="small">To</label>
-    <div class="card">
-      <div class="row">
-        <div class="left">
-          <div class="token-icon icon-btc">฿</div>
-          <div class="token-meta">
-            <div class="token-title">BTC <span style="font-weight:700;font-size:14px;color:rgba(0,0,0,0.45)">▾</span></div>
-            <div class="token-sub">Bitcoin</div>
-          </div>
-        </div>
-
-        <div style="flex:0 0 140px;">
-          <div class="amount-block">
-            <div class="amount-main">0.00509437</div>
-            <div class="amount-sub">≈$600.63</div>
+    <!-- To card -->
+    <div class="card token-card" aria-label="To token">
+      <label>To</label>
+      <div class="token-row">
+        <div class="token-icon icon-btc" aria-hidden="true">฿</div>
+        <div class="token-info">
+          <div class="token-title">
+            <div>
+              <div class="token-name">BTC <small style="font-weight:600;color:var(--muted);font-size:12px">▼</small></div>
+              <div class="token-sub">Bitcoin</div>
+            </div>
+            <div style="width:140px;">
+              <div class="amount" id="toAmount">0.00509437</div>
+              <div class="small-muted" id="toUsd">≈$600.63</div>
+            </div>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- Swap button (large pill) -->
-    <button class="swap-btn" aria-label="Swap">Swap</button>
+    <!-- Swap button -->
+    <div class="action">
+      <button class="btn-swap" id="swapBtn">Swap</button>
+    </div>
 
-    <!-- Details section (with Binance logo inline SVG to match screenshot) -->
-    <div class="details" role="list">
-      <div class="detail-row" role="listitem">
-        <div class="detail-left">Route</div>
-        <div class="detail-right" style="display:flex;align-items:center;justify-content:flex-end;gap:8px;">
-          <!-- Inline Binance-like SVG mark (visual reference only) -->
-          <svg width="20" height="20" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-            <rect width="24" height="24" rx="4" fill="#f3b61a"/>
-            <g fill="#111827" transform="translate(2,2) scale(0.8)">
-              <path d="M10 3.2L12.4 5.6 10 8 7.6 5.6 10 3.2zM3.2 10L5.6 12.4 8 10 5.6 7.6 3.2 10zM16 10L18.4 12.4 20.8 10 18.4 7.6 16 10zM10 16.8L12.4 14.4 10 12 7.6 14.4 10 16.8zM12.8 10L10 12.8 7.2 10 10 7.2 12.8 10z"/>
-            </g>
-          </svg>
-          <span style="font-weight:700;">Binance</span>
-          <span class="chev" aria-hidden="true"></span>
+    <!-- Details -->
+    <div class="details" aria-hidden="false">
+      <div class="detail-row">
+        <div class="flex-between" style="flex:1">
+          <div class="flex">
+            <span class="route-logo" title="Binance">B</span>
+            <div style="font-weight:600">Route</div>
+          </div>
         </div>
+        <div style="color:var(--muted);font-size:13px">Binance</div>
       </div>
 
       <div class="detail-row">
-        <div class="detail-left">Rate</div>
-        <div class="detail-right rate-small">1 USDT ≈ 0.0000084204 BTC</div>
+        <div>Rate</div>
+        <div id="rateText">1 USDT ≈ 0.0000084204 BTC</div>
       </div>
 
       <div class="detail-row">
-        <div class="detail-left">Slippage</div>
-        <div class="detail-right rate-small">Auto | 1%</div>
+        <div>Slippage</div>
+        <div id="slipText">Auto | 1%</div>
       </div>
 
       <div class="detail-row">
-        <div class="detail-left">Min. Received</div>
-        <div class="detail-right">0.0050434 BTC</div>
+        <div>Min. Received</div>
+        <div id="minRecv">0.0050434 BTC</div>
       </div>
 
       <div class="detail-row">
-        <div class="detail-left">Trading Fee</div>
-        <div class="detail-right"><s style="color:rgba(0,0,0,0.4)">0.5%</s> <span class="pill">Free</span></div>
+        <div>Trading Fee</div>
+        <div><s>0.5%</s> <span class="tag" style="background:#e6f8ee;color:#0d8f55">Free</span></div>
       </div>
     </div>
   </div>
+
+<script>
+  // Mock starting rate: 1 USDT = rate BTC (example value)
+  // We'll compute toAmount = fromAmount * rate
+  // The numbers mirror the screenshot-ish values (just for demo).
+  (function(){
+    const fromInput = document.getElementById('fromAmount');
+    const toAmountEl = document.getElementById('toAmount');
+    const fromUsdEl = document.getElementById('fromUsd');
+    const toUsdEl = document.getElementById('toUsd');
+    const rateText = document.getElementById('rateText');
+    const minRecvEl = document.getElementById('minRecv');
+    const flipBtn = document.getElementById('flipBtn');
+    const swapBtn = document.getElementById('swapBtn');
+
+    // Start tokens (simple object)
+    let tokenFrom = { symbol: 'USDT', usdPer: 1 }; // 1 USDT ≈ $1
+    let tokenTo   = { symbol: 'BTC', usdPer: 118000 }; // example BTC price in USD
+    // Derived rate:
+    function computeRate(){
+      // 1 FROM unit = (usdPer(from) / usdPer(to)) TO units
+      return tokenFrom.usdPer / tokenTo.usdPer;
+    }
+
+    // initialize example values to match screenshot vibe
+    tokenFrom.usdPer = 1.00005;             // small fractional difference
+    tokenTo.usdPer = 118000;                // BTC price -- adjust as needed
+    let slippagePercent = 1;                // 1%
+    let tradingFeeFree = true;
+
+    function updateUI(){
+      const rate = computeRate();
+      // format rate: 1 USDT -> x BTC
+      rateText.textContent = `1 ${tokenFrom.symbol} ≈ ${rate.toFixed(10)} ${tokenTo.symbol}`;
+
+      const fromAmt = parseFloat(fromInput.value) || 0;
+      const toAmt = fromAmt * rate;
+      // display to amount with 8 decimals typical for BTC
+      toAmountEl.textContent = toAmt === 0 ? '0.00000000' : toAmt.toFixed(8);
+
+      // USD approximations
+      const fromUsd = fromAmt * tokenFrom.usdPer;
+      fromUsdEl.textContent = `≈$${fromUsd.toFixed(2)}`;
+
+      const toUsd = toAmt * tokenTo.usdPer;
+      toUsdEl.textContent = `≈$${toUsd.toFixed(2)}`;
+
+      // Min Received considering slippage
+      const minReceived = toAmt * (1 - slippagePercent / 100);
+      minRecvEl.textContent = `${minReceived.toFixed(8)} ${tokenTo.symbol}`;
+    }
+
+    // flip tokens
+    flipBtn.addEventListener('click', () => {
+      // swap token objects
+      [tokenFrom, tokenTo] = [tokenTo, tokenFrom];
+
+      // update icons and labels (for demo we just swap the visible icons' colors/text)
+      // In a real app you'd re-render token icons, names, and input placeholders.
+      // Swap visual icons by changing classes:
+      const icons = document.querySelectorAll('.token-icon');
+      icons[0].classList.toggle('icon-usdt');
+      icons[0].classList.toggle('icon-btc');
+      icons[1].classList.toggle('icon-usdt');
+      icons[1].classList.toggle('icon-btc');
+
+      // Swap token text names (simple approach):
+      document.querySelectorAll('.token-name')[0].childNodes[0].textContent = tokenFrom.symbol + " ";
+      document.querySelectorAll('.token-sub')[0].textContent = tokenFrom.symbol === 'USDT' ? 'Tether USDT' : (tokenFrom.symbol === 'BTC' ? 'Bitcoin' : '');
+      document.querySelectorAll('.token-name')[1].childNodes[0].textContent = tokenTo.symbol + " ";
+      document.querySelectorAll('.token-sub')[1].textContent = tokenTo.symbol === 'BTC' ? 'Bitcoin' : (tokenTo.symbol === 'USDT' ? 'Tether USDT' : '');
+
+      // flip aria-pressed
+      flipBtn.setAttribute('aria-pressed', flipBtn.getAttribute('aria-pressed') === 'true' ? 'false' : 'true');
+
+      // After swapping tokens, update UI values: treat fromAmount input as same numeric value but units changed.
+      updateUI();
+    });
+
+    // update on input change
+    fromInput.addEventListener('input', updateUI);
+
+    // simulate swap button (simple confirmation)
+    swapBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      const fromAmt = parseFloat(fromInput.value) || 0;
+      if(fromAmt <= 0){ alert('Enter an amount to swap.'); fromInput.focus(); return; }
+      const rate = computeRate();
+      const toAmt = fromAmt * rate;
+      const minReceived = toAmt * (1 - slippagePercent/100);
+      const confirmMsg = `Swap ${fromAmt} ${tokenFrom.symbol} → ${toAmt.toFixed(8)} ${tokenTo.symbol}\nMin Received (after ${slippagePercent}% slippage): ${minReceived.toFixed(8)} ${tokenTo.symbol}\n\nProceed?`;
+      if(confirm(confirmMsg)){
+        // mock success
+        alert('Swap executed (demo).');
+      }
+    });
+
+    // initial render
+    // To match the screenshot numbers roughly:
+    // If we want 200 USDT => 0.00509437 BTC, the implied rate = 0.00509437 / 200 = 0.00002547185
+    // But screenshot had different numbers — this demo uses the computeRate approach based on usdPer.
+    // We'll set BTC price to produce a similar toAmount:
+    (function seedForScreenshot(){
+      // choose values so 200 USDT -> ~0.00509437 BTC:
+      const desiredTo = 0.00509437;
+      const fromVal = parseFloat(fromInput.value) || 200;
+      const impliedRate = desiredTo / fromVal; // ~0.00002547185
+      // choose tokenTo.usdPer so that rate = tokenFrom.usdPer / tokenTo.usdPer
+      tokenFrom.usdPer = 1.00005;
+      tokenTo.usdPer = tokenFrom.usdPer / impliedRate;
+    })();
+
+    updateUI();
+  })();
+</script>
 </body>
 </html>
